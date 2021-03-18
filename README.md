@@ -6,11 +6,11 @@
 
 
 ## :scroll: Description
-This is app that is build for #AndroidDevChallenge Week #4. It is a weather application, but to make
-things more interesting I built the application that reports weather on Mars! I uses data from NASA's
-InSight Mars lander. The lander is located near the equator at location named - Elysium Planitia, which.
-The data is available through the InSight: 
-[Mars Weather Service API](https://api.nasa.gov/assets/insight/InSight%20Weather%20API%20Documentation.pdf)
+This is app is created for #AndroidDevChallenge Week #4. It is a weather reporting application, 
+but to make things more interesting I built the application that reports weather on Mars! 
+I uses data from NASA's  InSight Mars lander. The lander is located near the equator at location
+named - Elysium Planitia. The data is available through the  
+[InSight: Mars Weather Service API](https://api.nasa.gov/assets/insight/InSight%20Weather%20API%20Documentation.pdf)
 
 Unfortunately though currently the landers solar pannels are covered with dust and it is
 placed in power conservation mode and not all data is available.

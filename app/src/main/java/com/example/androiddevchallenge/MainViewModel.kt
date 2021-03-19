@@ -32,7 +32,7 @@ class MainViewModel : ViewModel() {
     private val job = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + job)
 
-    private val _marsWeatherData = MutableLiveData<List<MarsWeatherData>>()
+    private val _marsWeatherData = MutableLiveData<List<MarsWeatherData>>(mutableListOf<MarsWeatherData>())
     val marsWeatherData: LiveData<List<MarsWeatherData>>
         get() = _marsWeatherData
 
@@ -45,6 +45,12 @@ class MainViewModel : ViewModel() {
         uiScope.launch {
             val data = MarsWeatherApi.retrofitService.getMarsWeatherData()
             _marsWeatherData.value = parseWeatherDataList(data)
+            Log.d(TAG, "Got Weather data!")
+            if(marsWeatherData.value !=null) {
+                for (item in marsWeatherData.value!!) {
+                    Log.d(TAG, "${item.sol}")
+                }
+            }
         }
     }
 

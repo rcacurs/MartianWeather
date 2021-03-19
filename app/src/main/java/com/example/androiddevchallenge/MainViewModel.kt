@@ -46,7 +46,7 @@ class MainViewModel : ViewModel() {
             val data = MarsWeatherApi.retrofitService.getMarsWeatherData()
             _marsWeatherData.value = parseWeatherDataList(data)
             Log.d(TAG, "Got Weather data!")
-            if(marsWeatherData.value !=null) {
+            if (marsWeatherData.value != null) {
                 for (item in marsWeatherData.value!!) {
                     Log.d(TAG, "${item.sol}")
                 }

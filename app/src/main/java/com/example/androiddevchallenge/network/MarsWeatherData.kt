@@ -59,7 +59,7 @@ suspend fun parseWeatherDataList(jsonString: String): List<MarsWeatherData> {
             val sol = sols.getString(it)
             parseSolWeatherData(jsonObject.getJSONObject(sol), sol.toInt())
         }
-        weatherData.sortedByDescending {item -> item.sol} // sort reversed
+        weatherData.sortedByDescending { item -> item.sol } // sort reversed
     }
 
 //    val jsonObject = JSONObject(jsonString)

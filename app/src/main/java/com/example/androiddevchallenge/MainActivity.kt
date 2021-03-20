@@ -22,7 +22,12 @@ import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,9 +46,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -56,7 +62,10 @@ import com.example.androiddevchallenge.network.MarsWeatherData
 import com.example.androiddevchallenge.network.Season
 import com.example.androiddevchallenge.network.SensorData
 import com.example.androiddevchallenge.ui.theme.MyTheme
+import com.example.androiddevchallenge.ui.theme.deepOrangeLight
 import com.example.androiddevchallenge.ui.theme.transparentBlack
+import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
+import dev.chrisbanes.accompanist.insets.systemBarsPadding
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -64,9 +73,11 @@ import java.util.Date
 private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
 
+    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
 
         window.statusBarColor = transparentBlack.toArgb()
+        window.navigationBarColor = transparentBlack.toArgb()
 
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -82,39 +93,41 @@ class MainActivity : AppCompatActivity() {
 }
 
 // Start building your app here!
+@ExperimentalAnimationApi
 @Composable
 fun MyApp(context: Context?, viewModel: MainViewModel) {
     // Surface(color = MaterialTheme.colors.background) {
     val weatherData: List<MarsWeatherData> by (viewModel.marsWeatherData)
         .observeAsState(mutableListOf<MarsWeatherData>())
-    Surface(
-        color = MaterialTheme.colors.background,
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Image(
-            painterResource(R.drawable.mars_crop_1),
-            contentDescription = "",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-        Column {
-            Divider(
-                modifier = Modifier.height(24.dp),
-                color = Color(0x00000000)
+    ProvideWindowInsets {
+        Surface(
+            color = MaterialTheme.colors.background,
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Image(
+                painterResource(R.drawable.mars_crop_1),
+                contentDescription = "",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()).padding(bottom = 56.dp)
+                modifier = Modifier.systemBarsPadding()
             ) {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()).padding(bottom = 8.dp)
+                ) {
 
-                for (item in weatherData) {
-                    WeatherCard(context, item)
+                    for (item in weatherData) {
+                        WeatherCard(context, item)
+                    }
                 }
             }
         }
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun WeatherCard(
     context: Context?,
@@ -128,12 +141,14 @@ fun WeatherCard(
         lastDate = Date()
     )
 ) {
+    val expanded = remember { mutableStateOf(false) }
     Card(
         elevation = 0.dp,
         modifier = Modifier
             .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 0.dp)
             .fillMaxWidth()
             .wrapContentHeight()
+            .clickable { expanded.value = !expanded.value }
     ) {
         Row(
             modifier = Modifier
@@ -144,7 +159,7 @@ fun WeatherCard(
             DateBlock(context, weatherData, modifier = Modifier.weight(1f))
             Divider(
                 modifier = Modifier
-                    .padding(top = 8.dp, bottom = 8.dp)
+                    .padding(top = 8.dp, bottom = 8.dp, start = 8.dp, end = 8.dp)
                     .height(100.dp)
                     .width(1.dp),
                 color = MaterialTheme.colors.onSurface
@@ -153,15 +168,15 @@ fun WeatherCard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.weight(1f)
             ) {
-                WeatherDataField("temperature", weatherData.atmosphericTemperature, "°F")
-                WeatherDataField("wind speed", weatherData.horizontalWindSpeed, "m/s")
+                WeatherDataField("temperature", weatherData.atmosphericTemperature, "°F", expanded.value)
+                WeatherDataField("wind speed", weatherData.horizontalWindSpeed, "m/s", expanded.value)
             }
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                WeatherDataField("atm. pressure", weatherData.atmosphericPressure, "Pa")
-                WeatherDataField("wind direction", null, "") // TODO implement weather direction data in data class
+                WeatherDataField("atm. pressure", weatherData.atmosphericPressure, "Pa", expanded.value)
+                WeatherDataField("wind direction", null, "", expanded.value) // TODO implement weather direction data in data class
             }
         }
     }
@@ -177,42 +192,102 @@ fun DateBlock(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        Text("Sol ${weatherData.sol}", style = MaterialTheme.typography.h4)
+        Text(
+            "Sol ${weatherData.sol}",
+            color = deepOrangeLight,
+            style = MaterialTheme.typography.h4
+        )
+        val season = when (weatherData.season) {
+            Season.SUMMER -> "summer"
+            Season.FALL -> "fall"
+            Season.WINTER -> "winter"
+            Season.SPRING -> "spring"
+            else -> "Unknown"
+        }
+        Text(
+            text = season,
+            style = MaterialTheme.typography.subtitle1,
+            color = deepOrangeLight
+        )
         val date = DateUtils.formatDateTime(context, weatherData.firstDate.time, DateUtils.FORMAT_NO_YEAR)
         Text(date, style = MaterialTheme.typography.h5)
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
-fun WeatherDataField(label: String, value: SensorData?, unit: String) {
-    ConstraintLayout {
-        val (valueField, labelField, unitField) = createRefs()
+fun WeatherDataField(label: String, value: SensorData?, unit: String, expanded: Boolean) {
+    ConstraintLayout() {
+        val (valueField, labelField, unitField, details) = createRefs()
         val displayValueAverage = if (value?.average == null) {
             "N/A"
         } else {
-            "%.1f".format(value?.average)
+            "%.1f".format(value.average)
         }
+        val displayValueMax = if (value?.max == null) {
+            "N/A"
+        } else {
+            "%.1f".format(value.max)
+        }
+        val displayValueMin = if (value?.min == null) {
+            "N/A"
+        } else {
+            "%.1f".format(value.min)
+        }
+        val displaySamples = if (value?.samples == null) {
+            "N/A"
+        } else {
+            "%d".format(value.samples)
+        }
+
         Text(
             text = displayValueAverage,
             style = MaterialTheme.typography.h4,
+            color = deepOrangeLight,
             modifier = Modifier.constrainAs(valueField) {
                 top.linkTo(parent.top, margin = 8.dp)
-                start.linkTo(parent.start, margin = 8.dp)
-                end.linkTo(parent.end, margin = 8.dp)
+                start.linkTo(parent.start, margin = 16.dp)
+                end.linkTo(parent.end, margin = 16.dp)
             }
         )
         Text(
             text = label,
-            style = MaterialTheme.typography.body2.copy(textAlign = TextAlign.Center),
+            style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
             modifier = Modifier.constrainAs(labelField) {
                 top.linkTo(valueField.bottom)
                 start.linkTo(valueField.start)
                 end.linkTo(valueField.end)
             }
         )
+        AnimatedVisibility(
+            visible = expanded,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+            // For detailed View
+            modifier = Modifier.constrainAs(details) {
+                top.linkTo(labelField.bottom)
+                start.linkTo(labelField.start)
+                end.linkTo(labelField.end)
+            }
+        ) {
+            Column() {
+                Text(
+                    text = "max: $displayValueMax",
+                    style = MaterialTheme.typography.caption,
+                )
+                Text(
+                    text = "min: $displayValueMin",
+                    style = MaterialTheme.typography.caption
+                )
+                Text(
+                    text = "samples: $displaySamples",
+                    style = MaterialTheme.typography.caption
+                )
+            }
+        }
         Text(
             text = unit,
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.caption,
             modifier = Modifier.constrainAs(unitField) {
                 top.linkTo(valueField.top)
                 bottom.linkTo(valueField.bottom)
@@ -238,6 +313,7 @@ fun WeatherDataField(label: String, value: SensorData?, unit: String) {
 //    }
 // }
 
+@ExperimentalAnimationApi
 @Preview("Weather Card Preview", widthDp = 400, heightDp = 360)
 @Composable
 fun CardPreview() {

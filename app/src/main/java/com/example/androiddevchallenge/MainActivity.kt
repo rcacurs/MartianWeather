@@ -27,6 +27,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,8 +42,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -50,6 +53,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -100,20 +104,26 @@ fun MyApp(context: Context?, viewModel: MainViewModel) {
     val weatherData: List<MarsWeatherData> by (viewModel.marsWeatherData)
         .observeAsState(mutableListOf<MarsWeatherData>())
     ProvideWindowInsets {
-        Surface(
-            color = MaterialTheme.colors.background,
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            Image(
-                painterResource(R.drawable.mars_crop_1),
-                contentDescription = "",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-            Column(
-                modifier = Modifier.systemBarsPadding()
-            ) {
+        Image(
+            painterResource(R.drawable.mars_crop_1),
+            contentDescription = "",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        Scaffold(
+            modifier = Modifier.background(Color.Transparent).systemBarsPadding(),
+            backgroundColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text("Mars Weather ", color = deepOrangeLight)
+                        Text("at Elysium Planitia", style = MaterialTheme.typography.caption)
+                    },
+                    backgroundColor = MaterialTheme.colors.surface,
+                    elevation = 0.dp
+                )
+            },
+            content = {
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState()).padding(bottom = 8.dp)
                 ) {
@@ -123,7 +133,7 @@ fun MyApp(context: Context?, viewModel: MainViewModel) {
                     }
                 }
             }
-        }
+        )
     }
 }
 
@@ -156,7 +166,7 @@ fun WeatherCard(
                 .wrapContentHeight(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            DateBlock(context, weatherData, modifier = Modifier.weight(1f))
+            DateBlock(context, weatherData, expanded.value, modifier = Modifier.weight(1f))
             Divider(
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 8.dp, start = 8.dp, end = 8.dp)
@@ -182,10 +192,12 @@ fun WeatherCard(
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun DateBlock(
     context: Context?,
     weatherData: MarsWeatherData,
+    expanded: Boolean,
     modifier: Modifier
 ) {
     Column(
@@ -211,6 +223,29 @@ fun DateBlock(
         )
         val date = DateUtils.formatDateTime(context, weatherData.firstDate.time, DateUtils.FORMAT_NO_YEAR)
         Text(date, style = MaterialTheme.typography.h5)
+
+        val dateStringStart = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(weatherData.firstDate)
+        val dateStringEnd = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(weatherData.lastDate)
+
+        AnimatedVisibility(
+            visible = expanded,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+            // For detailed View
+        ) {
+            Column {
+                Text(
+                    text = "period start:\n$dateStringStart",
+                    style = MaterialTheme.typography.subtitle2,
+                    textAlign = TextAlign.Left
+                )
+                Text(
+                    text = "period end:\n$dateStringEnd",
+                    style = MaterialTheme.typography.subtitle2,
+                    textAlign = TextAlign.Left
+                )
+            }
+        }
     }
 }
 

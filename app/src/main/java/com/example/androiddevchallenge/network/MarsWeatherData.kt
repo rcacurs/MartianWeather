@@ -21,6 +21,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
+import kotlin.random.Random
 
 var df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ") // used to parse date from the request
 
@@ -61,16 +62,8 @@ suspend fun parseWeatherDataList(jsonString: String): List<MarsWeatherData> {
         }
         weatherData.sortedByDescending { item -> item.sol } // sort reversed
     }
-
-//    val jsonObject = JSONObject(jsonString)
-//
-//    val sols = jsonObject.getJSONArray("sol_keys")
-//    val result = List<MarsWeatherData>(sols.length()) {
-//        val sol = sols.getString(it)
-//        parseSolWeatherData(jsonObject.getJSONObject(sol), sol.toInt())
-//    }
-//    return result
 }
+
 fun parseSensorData(jsonObject: JSONObject): SensorData {
     return SensorData(
         jsonObject.getDouble("av"),
@@ -79,6 +72,7 @@ fun parseSensorData(jsonObject: JSONObject): SensorData {
         jsonObject.getDouble("mx")
     )
 }
+
 fun parseSolWeatherData(solJson: JSONObject, sol: Int): MarsWeatherData {
     Log.d("Parsing weather data", "for sol - $sol")
     val at = solJson.optJSONObject("AT")
@@ -98,12 +92,31 @@ fun parseSolWeatherData(solJson: JSONObject, sol: Int): MarsWeatherData {
 
     return MarsWeatherData(
         sol,
-        if (at == null) null else parseSensorData(at),
-        if (hws == null) null else parseSensorData(hws),
+        if (at == null) generateFakeTemperature() else parseSensorData(at),
+        if (hws == null) generateFakeWindSpeed() else parseSensorData(hws),
         if (pre == null) null else parseSensorData(pre),
 
         season,
         start,
         end
+    )
+}
+
+// Just used for vizualization testing if weather data is not available from the probe
+fun generateFakeTemperature(): SensorData {
+    return SensorData(
+        average = Random.nextDouble(-66.7, -58.3),
+        samples = Random.nextInt(300784, 326642),
+        max = Random.nextDouble(-16.7, 20.0),
+        min = Random.nextDouble(-100.0, -75.0)
+    )
+}
+
+fun generateFakeWindSpeed(): SensorData {
+    return SensorData(
+        average = Random.nextDouble(4.0, 7.0),
+        samples = Random.nextInt(120000, 154146),
+        max = Random.nextDouble(15.0, 30.0),
+        min = Random.nextDouble(2.0, 3.0)
     )
 }

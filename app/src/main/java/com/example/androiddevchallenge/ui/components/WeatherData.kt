@@ -84,7 +84,7 @@ fun WeatherDataField(label: String, value: SensorData?, unit: String, expanded: 
             modifier = Modifier.constrainAs(details) {
                 top.linkTo(labelField.bottom)
                 start.linkTo(labelField.start)
-                end.linkTo(labelField.end)
+//                end.linkTo(labelField.end)
             }
         ) {
             Column() {
@@ -163,7 +163,6 @@ fun WindDirectionWeatherDataField(label: String, value: WindDirectionSensorData?
             modifier = Modifier.constrainAs(details) {
                 top.linkTo(labelField.bottom)
                 start.linkTo(labelField.start)
-                end.linkTo(labelField.end)
             }
         ) {
             Column() {

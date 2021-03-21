@@ -36,6 +36,10 @@ class MainViewModel : ViewModel() {
     val marsWeatherData: LiveData<List<MarsWeatherData>>
         get() = _marsWeatherData
 
+    private val _connecting = MutableLiveData<Boolean>(false)
+    val connecting: LiveData<Boolean>
+        get() = _connecting
+
     init {
         refreshWeatherData()
     }
@@ -43,14 +47,11 @@ class MainViewModel : ViewModel() {
     fun refreshWeatherData() {
         Log.d(TAG, "Refreshing Mars Weather Data...")
         uiScope.launch {
+            _connecting.value = true
             val data = MarsWeatherApi.retrofitService.getMarsWeatherData()
             _marsWeatherData.value = parseWeatherDataList(data)
             Log.d(TAG, "Got Weather data!")
-            if (marsWeatherData.value != null) {
-                for (item in marsWeatherData.value!!) {
-                    Log.d(TAG, "${item.sol}")
-                }
-            }
+            _connecting.value = false
         }
     }
 

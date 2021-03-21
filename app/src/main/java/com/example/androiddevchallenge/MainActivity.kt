@@ -23,7 +23,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -46,6 +48,7 @@ import com.example.androiddevchallenge.network.SensorData
 import com.example.androiddevchallenge.network.generateFakeTemperature
 import com.example.androiddevchallenge.network.generateFakeWindDirection
 import com.example.androiddevchallenge.network.generateFakeWindSpeed
+import com.example.androiddevchallenge.ui.components.LoadingIndicator
 import com.example.androiddevchallenge.ui.components.WeatherList
 import com.example.androiddevchallenge.ui.theme.MyTheme
 import com.example.androiddevchallenge.ui.theme.deepOrangeLight
@@ -80,10 +83,8 @@ class MainActivity : AppCompatActivity() {
 @ExperimentalAnimationApi
 @Composable
 fun MyApp(context: Context?, viewModel: MainViewModel?) {
-    val data = if (viewModel != null) {
-        viewModel.marsWeatherData
-    } else {
-        MutableLiveData<List<MarsWeatherData>>(
+    val weatherLiveData = viewModel?.marsWeatherData
+        ?: MutableLiveData(
             listOf(
                 MarsWeatherData(
                     sol = 815,
@@ -107,10 +108,13 @@ fun MyApp(context: Context?, viewModel: MainViewModel?) {
                 )
             )
         )
-    }
+    val connectingLiveData = viewModel?.connecting
+        ?: MutableLiveData(true)
 
-    val weatherData: List<MarsWeatherData> by (data)
+    val weatherData: List<MarsWeatherData> by (weatherLiveData)
         .observeAsState(mutableListOf())
+
+    val connecting: Boolean by (connectingLiveData).observeAsState(false)
 
     ProvideWindowInsets {
         Image(
@@ -133,7 +137,13 @@ fun MyApp(context: Context?, viewModel: MainViewModel?) {
                 )
             },
             content = {
-                WeatherList(weatherData, context)
+                Column {
+                    Button(onClick = { viewModel?.refreshWeatherData() }) {
+                        Text("Refresh")
+                    }
+                    LoadingIndicator(connecting)
+                    WeatherList(weatherData, context)
+                }
             }
         )
     }

@@ -19,8 +19,11 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.lang.Math.toRadians
 import java.text.SimpleDateFormat
 import java.util.Date
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.random.Random
 
 var df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ") // used to parse date from the request
@@ -33,6 +36,25 @@ enum class Season {
     UNKNOWN
 }
 
+enum class CompassDirection(name: String) {
+    N("N"),
+    NNE("NNE"),
+    NE("NE"),
+    NEE("NEE"),
+    E("E"),
+    EES("EES"),
+    ES("ES"),
+    ESS("ESS"),
+    S("S"),
+    SSW("SSW"),
+    SW("SW"),
+    SWW("SWW"),
+    W("W"),
+    WWN("WWN"),
+    WN("WN"),
+    WNN("WNN")
+}
+
 data class SensorData(
     val average: Double, // av
     val samples: Int, // ct
@@ -40,11 +62,20 @@ data class SensorData(
     val max: Double // mx
 )
 
+data class WindDirectionSensorData(
+    val compassPoint: CompassDirection,
+    val compassDegrees: Double,
+    val compassRight: Double,
+    val compassUp: Double,
+    val samples: Int
+)
+
 data class MarsWeatherData(
     val sol: Int = 0, // Martian day id
     val atmosphericTemperature: SensorData?, // in Fahrenheit
     val horizontalWindSpeed: SensorData?, // in m/s
     val atmosphericPressure: SensorData?, // in Pa
+    val windDirection: WindDirectionSensorData?,
     val season: Season,
     val firstDate: Date, // date of first measurement for period
     val lastDate: Date // date of last measurement for period
@@ -73,11 +104,23 @@ fun parseSensorData(jsonObject: JSONObject): SensorData {
     )
 }
 
+fun parseWindDirectionSensorData(jsonObject: JSONObject): WindDirectionSensorData {
+    val degrees = jsonObject.getDouble("compass_degrees")
+    return WindDirectionSensorData(
+        compassPoint = CompassDirection.valueOf(jsonObject.getString("compass_point")),
+        compassDegrees = degrees,
+        compassRight = jsonObject.getDouble("compass_right"),
+        compassUp = jsonObject.getDouble("compass_up"),
+        samples = jsonObject.getInt("ct")
+    )
+}
+
 fun parseSolWeatherData(solJson: JSONObject, sol: Int): MarsWeatherData {
     Log.d("Parsing weather data", "for sol - $sol")
     val at = solJson.optJSONObject("AT")
     val hws = solJson.optJSONObject("HWS")
     val pre = solJson.optJSONObject("PRE")
+    val wd = solJson.optJSONObject("WD").optJSONObject("most_common")
 
     val start = df.parse(solJson.getString("First_UTC").replace("Z", "-0000"))
     val end = df.parse(solJson.getString("Last_UTC").replace("Z", "-0000"))
@@ -95,14 +138,14 @@ fun parseSolWeatherData(solJson: JSONObject, sol: Int): MarsWeatherData {
         if (at == null) generateFakeTemperature() else parseSensorData(at),
         if (hws == null) generateFakeWindSpeed() else parseSensorData(hws),
         if (pre == null) null else parseSensorData(pre),
-
+        if (wd == null) generateFakeWindDirection() else parseWindDirectionSensorData(wd),
         season,
         start,
         end
     )
 }
 
-// Just used for vizualization testing if weather data is not available from the probe
+// Just used for visualization testing if weather data is not available from the probe
 fun generateFakeTemperature(): SensorData {
     return SensorData(
         average = Random.nextDouble(-66.7, -58.3),
@@ -118,5 +161,18 @@ fun generateFakeWindSpeed(): SensorData {
         samples = Random.nextInt(120000, 154146),
         max = Random.nextDouble(15.0, 30.0),
         min = Random.nextDouble(2.0, 3.0)
+    )
+}
+
+fun generateFakeWindDirection(): WindDirectionSensorData {
+    val pointerValues = List<Double>(32) { it * 11.25 }
+    val randomIdx = Random.nextInt(pointerValues.size)
+    val degree = pointerValues[randomIdx]
+    return WindDirectionSensorData(
+        compassPoint = CompassDirection.values()[randomIdx / 2],
+        compassDegrees = degree,
+        compassRight = sin(toRadians(degree)),
+        compassUp = cos(toRadians(degree)),
+        samples = Random.nextInt(20000, 28551)
     )
 }

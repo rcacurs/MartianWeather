@@ -80,7 +80,7 @@ fun WeatherList(
     val loadingIndicatorPosY = remember { mutableStateOf(-50.0f) }
     val refreshPosTarget = remember { 100f }
     val inDragToRefreshMode = remember { mutableStateOf(false) }
-    val dragSensitivity = remember { 0.5f }
+    val dragSensitivity = remember { 0.25f }
 
     /*
      *This check allows to animate list when the list is updated.

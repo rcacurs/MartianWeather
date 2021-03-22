@@ -20,5 +20,4 @@ import androidx.compose.ui.graphics.Color
 val deepOrangeLight = Color(0xFFFFA270)
 val deepOrangeVariant = Color(0xFFFF7043)
 val deepOrangeDark = Color(0xFFC63F17)
-
 val transparentBlack = Color(0x7F000000)

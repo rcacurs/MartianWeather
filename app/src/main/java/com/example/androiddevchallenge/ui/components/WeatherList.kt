@@ -77,11 +77,10 @@ fun WeatherList(
     val (visible, setVisible) = remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
-    val loadingIndicatorPosY = remember {mutableStateOf(-50.0f)}
-    val refreshPosTarget = remember {100f}
-    val inDragToRefreshMode = remember {mutableStateOf(false)}
-    val dragSensitivity = remember {0.5f}
-
+    val loadingIndicatorPosY = remember { mutableStateOf(-50.0f) }
+    val refreshPosTarget = remember { 100f }
+    val inDragToRefreshMode = remember { mutableStateOf(false) }
+    val dragSensitivity = remember { 0.5f }
 
     /*
      *This check allows to animate list when the list is updated.
@@ -122,13 +121,14 @@ fun WeatherList(
                     ) { change, dragAmount ->
 
                         if (scrollState.value == 0 &&
-                            ( inDragToRefreshMode.value || dragAmount > 0) &&
-                            ( !isRefreshingData ) // don't react to this gesture if already refreshing
+                            (inDragToRefreshMode.value || dragAmount > 0) &&
+                            (!isRefreshingData) // don't react to this gesture if already refreshing
                         ) {
                             inDragToRefreshMode.value = true
                             change.consumePositionChange()
                             loadingIndicatorPosY.value = min(
-                                refreshPosTarget, loadingIndicatorPosY.value + dragSensitivity * dragAmount)
+                                refreshPosTarget, loadingIndicatorPosY.value + dragSensitivity * dragAmount
+                            )
                         }
                     }
                 }
@@ -148,17 +148,17 @@ fun WeatherList(
 
                 modifier = Modifier
                     .size(40.dp)
-                    .offset{
+                    .offset {
                         IntOffset(
                             0,
-                            min(refreshPosTarget, loadingIndicatorPosY.value ).toInt())
+                            min(refreshPosTarget, loadingIndicatorPosY.value).toInt()
+                        )
                     }
-                    .rotate((loadingIndicatorPosY.value/refreshPosTarget)*360)
-                    .alpha(loadingIndicatorPosY.value/refreshPosTarget)
+                    .rotate((loadingIndicatorPosY.value / refreshPosTarget) * 360)
+                    .alpha(loadingIndicatorPosY.value / refreshPosTarget)
                     .background(deepOrangeLight, shape = CircleShape)
             )
         }
-
     }
 }
 

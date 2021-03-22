@@ -58,7 +58,7 @@ class MainViewModel : ViewModel() {
                 _marsWeatherData.value = parseWeatherDataList(data)
             } catch (exception: Exception) {
                 _connectionErrorFlag.value = true
-                Log.d(TAG,"Connection issue")
+                Log.d(TAG, "Connection issue")
             }
             Log.d(TAG, "Got Weather data!")
             _connecting.value = false

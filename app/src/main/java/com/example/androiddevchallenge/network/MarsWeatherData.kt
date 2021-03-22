@@ -144,7 +144,7 @@ fun parseSolWeatherData(solJson: JSONObject, sol: Int): MarsWeatherData {
         start,
         end
     )
-      // Use this return if returned data can be null
+    // Use this return if returned data can be null
 //    return MarsWeatherData(
 //        sol,
 //        if (at == null) null else parseSensorData(at),

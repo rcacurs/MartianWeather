@@ -163,13 +163,10 @@ fun MyApp(context: Context?, viewModel: MainViewModel?) {
                     }
 
                     WeatherList(
-                            weatherData,
-                            context,
-                            connecting
+                        weatherData,
+                        context,
+                        connecting
                     ) { viewModel?.refreshWeatherData() }
-
-
-
                 }
             }
         )

@@ -20,6 +20,8 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -117,7 +119,7 @@ fun WeatherDataField(label: String, value: SensorData?, unit: String, expanded: 
 @ExperimentalAnimationApi
 @Composable
 fun WindDirectionWeatherDataField(label: String, value: WindDirectionSensorData?, expanded: Boolean) {
-    ConstraintLayout() {
+    ConstraintLayout {
         val (valueField, labelField, unitField, details) = createRefs()
         val displayWinDirection = if (value?.compassPoint == null) {
             "N/A"
@@ -136,16 +138,28 @@ fun WindDirectionWeatherDataField(label: String, value: WindDirectionSensorData?
             "%d".format(value.samples)
         }
 
-        Text(
-            text = displayWinDirection,
-            style = MaterialTheme.typography.h4,
-            color = deepOrangeLight,
-            modifier = Modifier.constrainAs(valueField) {
-                top.linkTo(parent.top, margin = 8.dp)
-                start.linkTo(parent.start, margin = 16.dp)
-                end.linkTo(parent.end, margin = 16.dp)
-            }
-        )
+        if (value?.compassDegrees == null) {
+            Text(
+                text = displayWinDirection,
+                style = MaterialTheme.typography.h4,
+                color = deepOrangeLight,
+                modifier = Modifier.constrainAs(valueField) {
+                    top.linkTo(parent.top, margin = 8.dp)
+                    start.linkTo(parent.start, margin = 16.dp)
+                    end.linkTo(parent.end, margin = 16.dp)
+                }
+            )
+        } else {
+            Compass(
+                modifier = Modifier.width(46.dp).height(46.dp).constrainAs(valueField) {
+                    top.linkTo(parent.top, margin = 8.dp)
+                    start.linkTo(parent.start, margin = 16.dp)
+                    end.linkTo(parent.end, margin = 16.dp)
+                },
+                color = deepOrangeLight,
+                angle = value.compassDegrees.toFloat()
+            )
+        }
         Text(
             text = label,
             style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),

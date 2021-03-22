@@ -133,12 +133,23 @@ fun parseSolWeatherData(solJson: JSONObject, sol: Int): MarsWeatherData {
         else -> Season.UNKNOWN
     }
 
+//    return MarsWeatherData(
+//        sol,
+//        if (at == null) generateFakeTemperature() else parseSensorData(at),
+//        if (hws == null) generateFakeWindSpeed() else parseSensorData(hws),
+//        if (pre == null) null else parseSensorData(pre),
+//        if (wd == null) generateFakeWindDirection() else parseWindDirectionSensorData(wd),
+//        season,
+//        start,
+//        end
+//    )
+
     return MarsWeatherData(
         sol,
-        if (at == null) generateFakeTemperature() else parseSensorData(at),
-        if (hws == null) generateFakeWindSpeed() else parseSensorData(hws),
+        if (at == null) null else parseSensorData(at),
+        if (hws == null) null else parseSensorData(hws),
         if (pre == null) null else parseSensorData(pre),
-        if (wd == null) generateFakeWindDirection() else parseWindDirectionSensorData(wd),
+        if (wd == null) null else parseWindDirectionSensorData(wd),
         season,
         start,
         end

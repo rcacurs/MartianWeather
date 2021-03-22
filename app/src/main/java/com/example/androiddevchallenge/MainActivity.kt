@@ -25,9 +25,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -110,9 +112,12 @@ fun MyApp(context: Context?, viewModel: MainViewModel?) {
         )
     val connectingLiveData = viewModel?.connecting
         ?: MutableLiveData(true)
-
     val weatherData: List<MarsWeatherData> by (weatherLiveData)
         .observeAsState(mutableListOf())
+
+    val connectionProblemLiveData = viewModel?.connectionErrorFlag
+        ?: MutableLiveData(false)
+    val connectionProblemFlag: Boolean by (connectionProblemLiveData).observeAsState(false)
 
     val connecting: Boolean by (connectingLiveData).observeAsState(false)
 
@@ -138,11 +143,33 @@ fun MyApp(context: Context?, viewModel: MainViewModel?) {
             },
             content = {
                 Column {
-                    Button(onClick = { viewModel?.refreshWeatherData() }) {
-                        Text("Refresh")
-                    }
                     LoadingIndicator(connecting)
-                    WeatherList(weatherData, context)
+
+                    if (connectionProblemFlag) {
+                        Snackbar(
+                            action = {
+                                Button(
+                                    onClick = { viewModel?.refreshWeatherData() }
+                                ) {
+                                    Text("Refresh")
+                                }
+                            },
+                            elevation = 0.dp,
+                            modifier = Modifier.padding(8.dp),
+                            backgroundColor = MaterialTheme.colors.surface
+                        ) {
+                            Text(text = "Problem connecting to servers!", color = deepOrangeLight)
+                        }
+                    }
+
+                    WeatherList(
+                            weatherData,
+                            context,
+                            connecting
+                    ) { viewModel?.refreshWeatherData() }
+
+
+
                 }
             }
         )

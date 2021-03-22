@@ -48,7 +48,7 @@ fun Compass(
         val circleThickness = canvasWidth / 25
         val compassRadius = (size.minDimension / 2) - (circleThickness / 2)
         val needleLineThickness = circleThickness / 4
-        val labelSize = compassRadius / 3
+        val labelSize = compassRadius / 2.5f
         drawCircle(
             color = color,
             center = Offset(x = canvasWidth / 2, y = canvasHeight / 2),

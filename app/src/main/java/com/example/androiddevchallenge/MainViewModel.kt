@@ -36,6 +36,10 @@ class MainViewModel : ViewModel() {
     val marsWeatherData: LiveData<List<MarsWeatherData>>
         get() = _marsWeatherData
 
+    private val _connectionErrorFlag = MutableLiveData<Boolean> (false)
+    val connectionErrorFlag: LiveData<Boolean>
+        get() = _connectionErrorFlag
+
     private val _connecting = MutableLiveData<Boolean>(false)
     val connecting: LiveData<Boolean>
         get() = _connecting
@@ -45,11 +49,17 @@ class MainViewModel : ViewModel() {
     }
 
     fun refreshWeatherData() {
+        _connectionErrorFlag.value = false
         Log.d(TAG, "Refreshing Mars Weather Data...")
         uiScope.launch {
             _connecting.value = true
-            val data = MarsWeatherApi.retrofitService.getMarsWeatherData()
-            _marsWeatherData.value = parseWeatherDataList(data)
+            try {
+                val data = MarsWeatherApi.retrofitService.getMarsWeatherData()
+                _marsWeatherData.value = parseWeatherDataList(data)
+            } catch (exception: Exception) {
+                _connectionErrorFlag.value = true
+                Log.d(TAG,"Connection issue")
+            }
             Log.d(TAG, "Got Weather data!")
             _connecting.value = false
         }

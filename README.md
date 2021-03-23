@@ -14,12 +14,14 @@ named - Elysium Planitia. The data is available through the
 
 Unfortunately though currently the landers solar pannels are covered with dust and it is
 placed in power conservation mode and not all data is available.
-Currently only atmospheric pressure data is available. Hopefully all data will be available soon enough! For demonstration purposes missing data is generated!
+Currently only atmospheric pressure data is available. Hopefully all data will be available soon enough! For demonstration purposes missing data is generated.
 
 
 ## :bulb: Motivation and Context
 <!--- Optionally point readers to interesting parts of your submission. -->
 <!--- What are you especially proud of? -->
+
+My main motiviation for participating in these challenges was for updating my knowledge on android development. I was starting to get back into Android development and just in time the Jeptack compose went into Beta, and I decided that this is a very great time to learn this toolkit!
 
 I had a really good time learning Jetpack Compose. Building dynamic UI, was quite enjoyable, and implementing various ideas was very intuitive. 
 

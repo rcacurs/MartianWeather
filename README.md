@@ -25,13 +25,13 @@ My main motiviation for participating in these challenges was for updating my kn
 
 I had a really good time learning Jetpack Compose. Building dynamic UI, was quite enjoyable, and implementing various ideas was very intuitive. 
 
-![](results/expand-card.gif)
+![](results/screenshot_5.gif)
 
 I am happy, that I manage to draw custom composable for Compass, and also animate the compass needle, so it would look more interesting and would react to movement.
 
 I also managed to implement SwipeToRefreshLayout like behaviour for refreshing the data. Learned a lot about gesture detection in Compose!
 
-![](results/swipe-refresh.gif)
+![](results/screenshot6.gif)
 
 
 ## :camera_flash: Screenshots

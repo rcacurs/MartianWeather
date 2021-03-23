@@ -31,7 +31,7 @@ I am happy, that I manage to draw custom composable for Compass, and also animat
 
 I also managed to implement SwipeToRefreshLayout like behaviour for refreshing the data. Learned a lot about gesture detection in Compose!
 
-![](results/screenshot6.gif)
+![](results/screenshot_6.gif)
 
 
 ## :camera_flash: Screenshots

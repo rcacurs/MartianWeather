@@ -14,17 +14,32 @@ named - Elysium Planitia. The data is available through the
 
 Unfortunately though currently the landers solar pannels are covered with dust and it is
 placed in power conservation mode and not all data is available.
-Currently only atmospheric pressure data is available. Hopefully all data will be available soon enough!
+Currently only atmospheric pressure data is available. Hopefully all data will be available soon enough! For demonstration purposes missing data is generated!
 
 
 ## :bulb: Motivation and Context
 <!--- Optionally point readers to interesting parts of your submission. -->
 <!--- What are you especially proud of? -->
 
+I had a really good time learning Jetpack Compose. Building dynamic UI, was quite enjoyable, and implementing various ideas was very intuitive. 
+
+![](results/expand-card.gif)
+
+I am happy, that I manage to draw custom composable for Compass, and also animate the compass needle, so it would look more interesting and would react to movement.
+
+I also managed to implement SwipeToRefreshLayout like behaviour for refreshing the data. Learned a lot about gesture detection in Compose!
+
+![](results/swipe-refresh.gif)
+
 
 ## :camera_flash: Screenshots
 <!-- You can add more screenshots here if you like -->
-<img src="/results/screenshot_1.png" width="260">&emsp;<img src="/results/screenshot_2.png" width="260">
+<img src="results/screenshot_1.png" width="260">&emsp;<img src="results/screenshot_2.png" width="260">
+
+The weather cards can be expanded, to show more detail. Also created swipe to refresh like behaviour for refreshing weather data list.
+
+<img src="results/screenshot_3.png" width="260">&emsp;<img src="results/screenshot_4.png" width="260">
+
 
 ## License
 ```

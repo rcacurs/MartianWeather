@@ -71,7 +71,9 @@ fun WeatherList(
     weatherData: List<MarsWeatherData>,
     context: Context?,
     isRefreshingData: Boolean,
+    temperatureInCelsius: Boolean = true,
     onRefreshList: () -> Unit
+
 ) {
     val (previousList, setPreviousList) = remember { mutableStateOf(weatherData) }
     val (visible, setVisible) = remember { mutableStateOf(false) }
@@ -134,7 +136,11 @@ fun WeatherList(
                 }
         ) {
             for (item in weatherData) {
-                WeatherCard(context, item)
+                WeatherCard(
+                    context = context,
+                    weatherData = item,
+                    temperatureInCelsius = temperatureInCelsius
+                )
             }
         }
         Row(

@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -36,7 +37,7 @@ import com.example.androiddevchallenge.ui.theme.deepOrangeLight
 @ExperimentalAnimationApi
 @Composable
 fun WeatherDataField(label: String, value: SensorData?, unit: String, expanded: Boolean) {
-    ConstraintLayout() {
+    ConstraintLayout {
         val (valueField, labelField, unitField, details) = createRefs()
         val displayValueAverage = if (value?.average == null) {
             "N/A"
@@ -65,8 +66,8 @@ fun WeatherDataField(label: String, value: SensorData?, unit: String, expanded: 
             color = deepOrangeLight,
             modifier = Modifier.constrainAs(valueField) {
                 top.linkTo(parent.top, margin = 8.dp)
-                start.linkTo(parent.start, margin = 16.dp)
-                end.linkTo(parent.end, margin = 16.dp)
+                start.linkTo(parent.start, margin = 8.dp)
+                end.linkTo(parent.end, margin = 8.dp)
             }
         )
         Text(
@@ -89,7 +90,7 @@ fun WeatherDataField(label: String, value: SensorData?, unit: String, expanded: 
 //                end.linkTo(labelField.end)
             }
         ) {
-            Column() {
+            Column {
                 Text(
                     text = "max: $displayValueMax",
                     style = MaterialTheme.typography.caption,
@@ -99,7 +100,7 @@ fun WeatherDataField(label: String, value: SensorData?, unit: String, expanded: 
                     style = MaterialTheme.typography.caption
                 )
                 Text(
-                    text = "samples: $displaySamples",
+                    text = "values: $displaySamples",
                     style = MaterialTheme.typography.caption
                 )
             }
@@ -118,9 +119,14 @@ fun WeatherDataField(label: String, value: SensorData?, unit: String, expanded: 
 
 @ExperimentalAnimationApi
 @Composable
-fun WindDirectionWeatherDataField(label: String, value: WindDirectionSensorData?, expanded: Boolean) {
+fun WindDirectionWeatherDataField(
+    label: String,
+    value: WindDirectionSensorData?,
+    expanded: Boolean,
+    nudge: MutableState<Boolean>
+) {
     ConstraintLayout {
-        val (valueField, labelField, unitField, details) = createRefs()
+        val (valueField, labelField, details) = createRefs()
         val displayWinDirection = if (value?.compassPoint == null) {
             "N/A"
         } else {
@@ -157,7 +163,8 @@ fun WindDirectionWeatherDataField(label: String, value: WindDirectionSensorData?
                     end.linkTo(parent.end, margin = 16.dp)
                 },
                 color = deepOrangeLight,
-                angle = value.compassDegrees.toFloat()
+                angle = value.compassDegrees.toFloat(),
+                nudge = nudge
             )
         }
         Text(

@@ -16,6 +16,10 @@
 package com.example.androiddevchallenge
 
 import android.content.Context
+import android.icu.util.LocaleData
+import android.icu.util.LocaleData.getMeasurementSystem
+import android.icu.util.ULocale
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -64,18 +68,23 @@ class MainActivity : AppCompatActivity() {
 
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        var temperatureUnitsCelsium = true
+        val viewModel: MainViewModel by viewModels()
 
         window.statusBarColor = transparentBlack.toArgb()
         window.navigationBarColor = transparentBlack.toArgb()
-
-        super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
-        val viewModel: MainViewModel by viewModels()
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val measSystem = getMeasurementSystem(
+                ULocale(resources.configuration.locales[0].toString())
+            )
+            temperatureUnitsCelsium = measSystem != LocaleData.MeasurementSystem.US
+        }
         setContent {
             MyTheme {
-                MyApp(this, viewModel)
+                MyApp(this, viewModel, temperatureUnitsCelsium)
             }
         }
     }
@@ -84,8 +93,9 @@ class MainActivity : AppCompatActivity() {
 // Start building your app here!
 @ExperimentalAnimationApi
 @Composable
-fun MyApp(context: Context?, viewModel: MainViewModel?) {
+fun MyApp(context: Context?, viewModel: MainViewModel?, temperatureUnitsCelsium: Boolean = true) {
     val weatherLiveData = viewModel?.marsWeatherData
+        // for the preview generate the data
         ?: MutableLiveData(
             listOf(
                 MarsWeatherData(
@@ -123,7 +133,7 @@ fun MyApp(context: Context?, viewModel: MainViewModel?) {
 
     ProvideWindowInsets {
         Image(
-            painterResource(R.drawable.mars_crop_1),
+            painterResource(R.drawable.mars_crop_2),
             contentDescription = "",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -163,9 +173,10 @@ fun MyApp(context: Context?, viewModel: MainViewModel?) {
                     }
 
                     WeatherList(
-                        weatherData,
-                        context,
-                        connecting
+                        weatherData = weatherData,
+                        context = context,
+                        isRefreshingData = connecting,
+                        temperatureInCelsius = temperatureUnitsCelsium,
                     ) { viewModel?.refreshWeatherData() }
                 }
             }

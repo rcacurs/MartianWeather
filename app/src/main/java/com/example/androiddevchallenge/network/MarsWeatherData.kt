@@ -60,7 +60,16 @@ data class SensorData(
     val samples: Int, // ct
     val min: Double, // mn
     val max: Double // mx
-)
+) {
+    fun toCelsius(): SensorData {
+        return SensorData(
+            average = convertToCelsius(average),
+            samples = samples,
+            min = convertToCelsius(average),
+            max = convertToCelsius(average)
+        )
+    }
+}
 
 data class WindDirectionSensorData(
     val compassPoint: CompassDirection,
@@ -87,7 +96,7 @@ suspend fun parseWeatherDataList(jsonString: String): List<MarsWeatherData> {
         val sols = jsonObject.getJSONArray("sol_keys")
 
         // returns this List of MarsWeatherData objects
-        val weatherData = List<MarsWeatherData>(sols.length()) {
+        val weatherData = List(sols.length()) {
             val sol = sols.getString(it)
             parseSolWeatherData(jsonObject.getJSONObject(sol), sol.toInt())
         }
@@ -177,7 +186,7 @@ fun generateFakeWindSpeed(): SensorData {
 }
 
 fun generateFakeWindDirection(): WindDirectionSensorData {
-    val pointerValues = List<Double>(32) { it * 11.25 }
+    val pointerValues = List(32) { it * 11.25 }
     val randomIdx = Random.nextInt(pointerValues.size)
     val degree = pointerValues[randomIdx]
     return WindDirectionSensorData(
@@ -187,4 +196,8 @@ fun generateFakeWindDirection(): WindDirectionSensorData {
         compassUp = cos(toRadians(degree)),
         samples = Random.nextInt(20000, 28551)
     )
+}
+
+fun convertToCelsius(input: Double): Double {
+    return (input - 32) * 5 / 9
 }

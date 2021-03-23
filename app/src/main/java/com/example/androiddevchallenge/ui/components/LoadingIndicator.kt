@@ -50,7 +50,10 @@ fun LoadingIndicator(visible: Boolean) {
         ) {
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             Box(
-                modifier = Modifier.fillMaxWidth().background(MaterialTheme.colors.surface).padding(8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colors.surface)
+                    .padding(8.dp)
             ) {
                 Text(
                     text = "Waiting for data from NASA...",

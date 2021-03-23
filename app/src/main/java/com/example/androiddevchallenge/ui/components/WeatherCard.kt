@@ -30,8 +30,10 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,8 +60,10 @@ fun WeatherCard(
         season = Season.SUMMER,
         firstDate = Date(),
         lastDate = Date()
-    )
+    ),
+    temperatureInCelsius: Boolean = true
 ) {
+    var nudge = remember { mutableStateOf(true) }
     val expanded = remember { mutableStateOf(false) }
     Card(
         elevation = 0.dp,
@@ -67,7 +71,7 @@ fun WeatherCard(
             .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 0.dp)
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable { expanded.value = !expanded.value }
+            .clickable { expanded.value = !expanded.value; nudge.value = true }
     ) {
         Row(
             modifier = Modifier
@@ -89,8 +93,12 @@ fun WeatherCard(
             ) {
                 WeatherDataField(
                     label = "temperature",
-                    value = weatherData.atmosphericTemperature,
-                    unit = "°F",
+                    value = if (temperatureInCelsius) {
+                        weatherData.atmosphericTemperature
+                    } else {
+                        weatherData.atmosphericTemperature?.toCelsius()
+                    },
+                    unit = if (temperatureInCelsius) "°C" else "°F",
                     expanded = expanded.value
                 )
                 WeatherDataField(
@@ -113,7 +121,8 @@ fun WeatherCard(
                 WindDirectionWeatherDataField(
                     label = "wind direction",
                     value = weatherData.windDirection,
-                    expanded = expanded.value
+                    expanded = expanded.value,
+                    nudge = nudge
                 )
             }
         }

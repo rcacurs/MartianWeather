@@ -17,10 +17,16 @@ package com.example.androiddevchallenge.ui.components
 
 import android.graphics.Paint
 import android.graphics.Rect
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -37,8 +43,26 @@ import com.example.androiddevchallenge.ui.theme.deepOrangeLight
 fun Compass(
     modifier: Modifier,
     color: Color = Color.White,
-    angle: Float = 0f
+    angle: Float = 0f,
+    nudge: MutableState<Boolean>
 ) {
+    val needleAngle = animateFloatAsState(
+        targetValue = angle + if (nudge.value) 45f else 0f,
+        animationSpec =
+        if (nudge.value) {
+            tween(10)
+        } else {
+            spring(
+                Spring.DampingRatioHighBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        },
+        finishedListener = {
+            if (nudge.value) {
+                nudge.value = false
+            }
+        }
+    )
 
     Canvas(modifier = modifier) {
         val canvasWidth = size.width
@@ -69,7 +93,7 @@ fun Compass(
         compassDown.lineTo(centerX - compassRadius / 5, centerY + needleLineThickness / 2)
         compassDown.lineTo(centerX, centerY + needleLineThickness / 2)
         rotate(
-            degrees = angle,
+            degrees = needleAngle.value,
             pivot = Offset(centerX, centerY)
         ) {
             drawPath(
@@ -88,7 +112,7 @@ fun Compass(
             )
         }
 
-        val paint = android.graphics.Paint()
+        val paint = Paint()
         paint.textSize = labelSize
         paint.color = deepOrangeLight.toArgb()
         paint.textAlign = Paint.Align.CENTER
@@ -135,6 +159,7 @@ fun PreviewCompass() {
     Compass(
         color = deepOrangeLight,
         modifier = Modifier.width(200.dp).height(200.dp),
-        angle = 90f
+        angle = 90f,
+        nudge = mutableStateOf(false)
     )
 }
